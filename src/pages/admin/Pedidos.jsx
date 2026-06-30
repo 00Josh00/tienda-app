@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getAdminPedidos } from '../../api/client';
+import { getAdminPedidos, deleteAdminPedido } from '../../api/client';
 import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
@@ -22,6 +22,16 @@ export default function AdminPedidos() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  async function handleDelete(id, nombre) {
+    if (!confirm(`¿Eliminar pedido #${id}${nombre ? ' de ' + nombre : ''}?`)) return;
+    try {
+      await deleteAdminPedido(id);
+      setPedidos(pedidos.filter(p => p.id !== id));
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
 
   if (loading) return <LoadingSpinner />;
 
@@ -57,6 +67,9 @@ export default function AdminPedidos() {
               <td>{p.creado_en ? new Date(p.creado_en).toLocaleDateString() : '-'}</td>
               <td>
                 <Link to={`/admin/pedidos/${p.id}`} className="btn btn-sm btn-outline">Ver</Link>
+                <button className="btn btn-sm btn-danger" style={{ marginLeft: '0.5rem' }} onClick={() => handleDelete(p.id, p.usuario)}>
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}

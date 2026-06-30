@@ -154,3 +154,7 @@ export function updateAdminPedidoEstado(id, estado) {
     body: JSON.stringify({ estado }),
   });
 }
+
+export function deleteAdminPedido(id) {
+  return request(`/admin/pedidos/${id}`, { method: 'DELETE' });
+}

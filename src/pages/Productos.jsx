@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getProductos, getCategorias } from '../api/client';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -21,21 +21,23 @@ export default function Productos() {
       .finally(() => setLoading(false));
   }, [categoriaId]);
 
+  const selectedCat = categoriaId ? categorias.find(c => c.id === Number(categoriaId)) : null;
+
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container section">
-      <h1>Productos</h1>
+      <h1>{selectedCat ? selectedCat.nombre : 'Todos los productos'}</h1>
       <div className="categorias-filter">
-        <a href="/productos" className={`tag ${!categoriaId ? 'active' : ''}`}>Todos</a>
+        <Link to="/productos" className={`tag ${!categoriaId ? 'active' : ''}`}>Todos</Link>
         {categorias.map(cat => (
-          <a
+          <Link
             key={cat.id}
-            href={`/productos?categoria=${cat.id}`}
+            to={`/productos?categoria=${cat.id}`}
             className={`tag ${categoriaId === String(cat.id) ? 'active' : ''}`}
           >
             {cat.nombre}
-          </a>
+          </Link>
         ))}
       </div>
       {productos.length === 0 ? (

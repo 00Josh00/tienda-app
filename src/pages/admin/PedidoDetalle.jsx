@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getAdminPedido, updateAdminPedidoEstado } from '../../api/client';
+import { getAdminPedido, updateAdminPedidoEstado, deleteAdminPedido } from '../../api/client';
 import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
@@ -27,6 +27,16 @@ export default function AdminPedidoDetalle() {
     cargar();
   }
 
+  async function handleDelete() {
+    if (!confirm(`¿Eliminar pedido #${pedido.id} permanentemente?`)) return;
+    try {
+      await deleteAdminPedido(pedido.id);
+      navigate('/admin/pedidos');
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
   if (loading) return <LoadingSpinner />;
   if (!pedido) return <p>No encontrado</p>;
 
@@ -43,10 +53,13 @@ export default function AdminPedidoDetalle() {
         <p><strong>Teléfono:</strong> {pedido.telefono || '-'}</p>
         <p><strong>Fecha:</strong> {new Date(pedido.creado_en).toLocaleString()}</p>
         <p><strong>Total:</strong> {formatPrice(pedido.total)}</p>
-        <p style={{ marginTop: '0.75rem' }}>
+        <p style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
           <a href={`/api/pedidos/${pedido.id}/boleta`} target="_blank" className="btn btn-sm btn-accent" rel="noreferrer">
             Ver boleta
           </a>
+          <button className="btn btn-sm btn-danger" onClick={handleDelete}>
+            Eliminar pedido
+          </button>
         </p>
       </div>
 
