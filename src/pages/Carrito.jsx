@@ -73,6 +73,7 @@ export default function Carrito() {
       items[idx].cantidad = nueva;
       setGuestCart(items);
       setGuestCartState([...items]);
+      window.dispatchEvent(new Event('cart-change'));
     }
   }
 
@@ -88,6 +89,7 @@ export default function Carrito() {
       const items = getGuestCart().filter(i => i.producto_id !== productoId);
       setGuestCart(items);
       setGuestCartState(items);
+      window.dispatchEvent(new Event('cart-change'));
     }
   }
 
@@ -100,6 +102,7 @@ export default function Carrito() {
       const items = getGuestCart().filter(i => i.producto_id !== productoId);
       setGuestCart(items);
       setGuestCartState(items);
+      window.dispatchEvent(new Event('cart-change'));
       cargarCarrito();
     } catch (err) {
       alert(err.message);
@@ -122,6 +125,7 @@ export default function Carrito() {
       const result = await createGuestOrder(items, form.nombre, form.email, form.dni, idempotencyKey);
 
       localStorage.removeItem('guest_cart');
+      window.dispatchEvent(new Event('cart-change'));
       navigate(`/pedido-exitoso/${result.id}`);
     } catch (err) {
       setError(err.message);
@@ -182,7 +186,7 @@ export default function Carrito() {
               </button>
             )}
             <button className="btn btn-accent btn-lg" onClick={() => setShowCheckout(true)}>
-              Continuar compra
+              Hacer pedido
             </button>
           </div>
         </div>
@@ -205,7 +209,7 @@ export default function Carrito() {
                 <input value={form.dni} onChange={e => setForm({ ...form, dni: e.target.value.replace(/\D/g, '').slice(0, 8) })} placeholder="12345678" required />
               </div>
               <button className="btn btn-accent btn-lg btn-block" disabled={submitting}>
-                {submitting ? 'Procesando...' : `Pagar ${formatPrice(guestTotal)}`}
+                {submitting ? 'Procesando...' :                `Hacer pedido - ${formatPrice(guestTotal)}`}
               </button>
             </form>
           </div>
@@ -253,7 +257,7 @@ export default function Carrito() {
         <div className="cart-total">
           <h2>Total: {formatPrice(total)}</h2>
           <button className="btn btn-accent btn-lg" disabled={submitting} onClick={handleCheckout}>
-            {submitting ? 'Procesando...' : 'Finalizar compra'}
+            {submitting ? 'Procesando...' : 'Hacer pedido'}
           </button>
         </div>
       </>

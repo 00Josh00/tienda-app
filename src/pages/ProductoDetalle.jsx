@@ -39,6 +39,7 @@ export default function ProductoDetalle() {
         });
       }
       localStorage.setItem('guest_cart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('cart-change'));
       alert('Producto agregado al carrito');
       return;
     }
