@@ -71,3 +71,68 @@ export function updateCarrito(producto_id, cantidad) {
 export function removeFromCarrito(producto_id) {
   return request(`/carrito/${producto_id}`, { method: 'DELETE' });
 }
+
+// Admin
+export function getAdminProductos() {
+  return request('/admin/productos');
+}
+
+export function createAdminProducto(data) {
+  return request('/admin/productos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateAdminProducto(id, data) {
+  return request(`/admin/productos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteAdminProducto(id) {
+  return request(`/admin/productos/${id}`, { method: 'DELETE' });
+}
+
+export function getAdminCategorias() {
+  return request('/admin/categorias');
+}
+
+export function createAdminCategoria(data) {
+  return request('/admin/categorias', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateAdminCategoria(id, data) {
+  return request(`/admin/categorias/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteAdminCategoria(id) {
+  return request(`/admin/categorias/${id}`, { method: 'DELETE' });
+}
+
+export function getAdminPedidos() {
+  return request('/admin/pedidos');
+}
+
+export function getAdminPedido(id) {
+  return request(`/admin/pedidos/${id}`);
+}
+
+export function updateAdminPedidoEstado(id, estado) {
+  return request(`/admin/pedidos/${id}/estado`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ estado }),
+  });
+}

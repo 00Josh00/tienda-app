@@ -11,6 +11,13 @@ const ProductoDetalle = lazy(() => import('./pages/ProductoDetalle'));
 const Carrito = lazy(() => import('./pages/Carrito'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
+const AdminRoute = lazy(() => import('./pages/admin/AdminRoute'));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const AdminProductos = lazy(() => import('./pages/admin/Productos'));
+const AdminCategorias = lazy(() => import('./pages/admin/Categorias'));
+const AdminPedidos = lazy(() => import('./pages/admin/Pedidos'));
+const AdminPedidoDetalle = lazy(() => import('./pages/admin/PedidoDetalle'));
 
 export default function App() {
   return (
@@ -27,6 +34,15 @@ export default function App() {
                 <Route path="/carrito" element={<Carrito />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Register />} />
+                <Route path="/admin" element={<AdminRoute />}>
+                  <Route element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="productos" element={<AdminProductos />} />
+                    <Route path="categorias" element={<AdminCategorias />} />
+                    <Route path="pedidos" element={<AdminPedidos />} />
+                    <Route path="pedidos/:id" element={<AdminPedidoDetalle />} />
+                  </Route>
+                </Route>
               </Routes>
             </Suspense>
           </main>

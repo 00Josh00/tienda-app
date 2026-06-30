@@ -17,6 +17,7 @@ export default function Header() {
           {usuario ? (
             <>
               <span className="nav-user">{usuario.nombre}</span>
+              {usuario.rol === 'admin' && <Link to="/admin" className="btn btn-outline btn-sm">Admin</Link>}
               <button className="btn btn-outline btn-sm" onClick={logout}>Salir</button>
             </>
           ) : (
