@@ -41,6 +41,11 @@ export default function AdminPedidoDetalle() {
         <p><strong>Cliente:</strong> {pedido.usuario} ({pedido.email})</p>
         <p><strong>Fecha:</strong> {new Date(pedido.creado_en).toLocaleString()}</p>
         <p><strong>Total:</strong> {formatPrice(pedido.total)}</p>
+        <p style={{ marginTop: '0.75rem' }}>
+          <a href={`/api/pedidos/${pedido.id}/boleta`} target="_blank" className="btn btn-sm btn-accent" rel="noreferrer">
+            Ver boleta
+          </a>
+        </p>
       </div>
 
       <div className="estado-flow">
