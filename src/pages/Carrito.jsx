@@ -31,6 +31,9 @@ export default function Carrito() {
   const guestItems = guestCart.filter(i => i.cantidad > 0);
   const guestTotal = guestItems.reduce((s, i) => s + Number(i.precio) * i.cantidad, 0);
 
+  const items = carrito?.items || [];
+  const total = carrito?.total || 0;
+
   function cargarCarrito() {
     if (!usuario) { setLoading(false); return; }
     setLoading(true);
@@ -55,7 +58,8 @@ export default function Carrito() {
 
   async function handleCantidad(productoId, delta) {
     if (usuario) {
-      const item = carrito.items.find(i => i.producto_id === productoId);
+      const item = items.find(i => i.producto_id === productoId);
+      if (!item) return;
       const nueva = Math.max(1, item.cantidad + delta);
       if (nueva > item.stock) return;
       try {
@@ -146,6 +150,61 @@ export default function Carrito() {
     }
   }
 
+  function renderCartItems(cartItems, priceKey, idKey) {
+    return (
+      <>
+        <div className="cart-items">
+          {cartItems.map(item => (
+            <div key={item[idKey]} className="cart-item">
+              <img src={item.imagen_url} alt={item.nombre} className="cart-item-image" />
+              <div className="cart-item-info">
+                <h3>{item.nombre}</h3>
+                <p className="cart-item-price">{formatPrice(item[priceKey])}</p>
+              </div>
+              <div className="cart-item-actions">
+                <div className="cart-item-qty">
+                  <button onClick={() => handleCantidad(item[idKey], -1)} disabled={item.cantidad <= 1}>-</button>
+                  <span>{item.cantidad}</span>
+                  <button onClick={() => handleCantidad(item[idKey], 1)} disabled={item.cantidad >= item.stock}>+</button>
+                </div>
+                <span className="cart-item-subtotal">{formatPrice(item.cantidad * Number(item[priceKey]))}</span>
+                <button className="cart-item-remove" onClick={() => handleEliminar(item[idKey])} aria-label="Eliminar">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="cart-total" id="cart-total">
+          <h2>Total: {formatPrice(usuario ? total : guestTotal)}</h2>
+          {usuario && (
+            <button className="btn btn-accent btn-lg" disabled={submitting} onClick={handleCheckout}>
+              {submitting ? 'Procesando...' : 'Hacer pedido'}
+            </button>
+          )}
+        </div>
+
+        {/* Mobile sticky checkout */}
+        <div className="sticky-bottom">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Total</span>
+            <span style={{ fontWeight: 700, fontSize: '1.125rem' }}>{formatPrice(usuario ? total : guestTotal)}</span>
+          </div>
+          {usuario ? (
+            <button className="btn btn-accent btn-lg" disabled={submitting} onClick={handleCheckout}>
+              {submitting ? 'Procesando...' : 'Hacer pedido'}
+            </button>
+          ) : (
+            <button className="btn btn-accent btn-lg" onClick={() => setShowCheckout(true)}>
+              Hacer pedido - {formatPrice(guestTotal)}
+            </button>
+          )}
+        </div>
+      </>
+    );
+  }
+
   function renderGuestCart() {
     if (guestItems.length === 0) {
       return (
@@ -158,41 +217,14 @@ export default function Carrito() {
 
     return (
       <>
-        <div className="cart-items">
-          {guestItems.map(item => (
-            <div key={item.producto_id} className="cart-item">
-              <img src={item.imagen_url} alt={item.nombre} className="cart-item-image" />
-              <div className="cart-item-info">
-                <h3>{item.nombre}</h3>
-                <p className="cart-item-price">{formatPrice(item.precio)}</p>
-              </div>
-              <div className="cart-item-qty">
-                <button onClick={() => handleCantidad(item.producto_id, -1)} disabled={item.cantidad <= 1}>-</button>
-                <span>{item.cantidad}</span>
-                <button onClick={() => handleCantidad(item.producto_id, 1)} disabled={item.cantidad >= item.stock}>+</button>
-              </div>
-              <p className="cart-item-subtotal">{formatPrice(item.cantidad * Number(item.precio))}</p>
-              <button className="btn btn-outline btn-sm" onClick={() => handleEliminar(item.producto_id)}>Eliminar</button>
-            </div>
-          ))}
-        </div>
+        {renderCartItems(
+          guestItems.map(i => ({ ...i, producto_id: i.producto_id, precio: Number(i.precio) })),
+          'precio', 'producto_id'
+        )}
 
-        <div className="cart-total">
-          <h2>Total: {formatPrice(guestTotal)}</h2>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            {usuario && (
-              <button className="btn btn-outline btn-sm" onClick={() => handleAddFromGuest(guestItems[0]?.producto_id)}>
-                Mover a mi cuenta
-              </button>
-            )}
-            <button className="btn btn-accent btn-lg" onClick={() => setShowCheckout(true)}>
-              Hacer pedido
-            </button>
-          </div>
-        </div>
-
+        {/* Guest checkout form */}
         {showCheckout && (
-          <div className="section" style={{ maxWidth: 500, margin: '2rem auto' }}>
+          <div className="checkout-form">
             <h2>Datos para la boleta</h2>
             {error && <div className="alert alert-error">{error}</div>}
             <form onSubmit={handleGuestOrder}>
@@ -213,7 +245,7 @@ export default function Carrito() {
                 <input value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })} placeholder="999888777" required />
               </div>
               <button className="btn btn-accent btn-lg btn-block" disabled={submitting}>
-                {submitting ? 'Procesando...' :                `Hacer pedido - ${formatPrice(guestTotal)}`}
+                {submitting ? 'Procesando...' : `Hacer pedido - ${formatPrice(guestTotal)}`}
               </button>
             </form>
           </div>
@@ -225,10 +257,6 @@ export default function Carrito() {
   function renderAuthCart() {
     if (!usuario) return null;
     if (loading) return <LoadingSpinner />;
-
-    const items = carrito?.items || [];
-    const total = carrito?.total || 0;
-
     if (items.length === 0) {
       return (
         <div className="empty">
@@ -238,50 +266,23 @@ export default function Carrito() {
       );
     }
 
-    return (
-      <>
-        <div className="cart-items">
-          {items.map(item => (
-            <div key={item.id} className="cart-item">
-              <img src={item.imagen_url} alt={item.nombre} className="cart-item-image" />
-              <div className="cart-item-info">
-                <h3>{item.nombre}</h3>
-                <p className="cart-item-price">{formatPrice(item.precio_unitario)}</p>
-              </div>
-              <div className="cart-item-qty">
-                <button onClick={() => handleCantidad(item.producto_id, -1)} disabled={item.cantidad <= 1}>-</button>
-                <span>{item.cantidad}</span>
-                <button onClick={() => handleCantidad(item.producto_id, 1)} disabled={item.cantidad >= item.stock}>+</button>
-              </div>
-              <p className="cart-item-subtotal">{formatPrice(item.cantidad * Number(item.precio_unitario))}</p>
-              <button className="btn btn-outline btn-sm" onClick={() => handleEliminar(item.producto_id)}>Eliminar</button>
-            </div>
-          ))}
-        </div>
-        <div className="cart-total">
-          <h2>Total: {formatPrice(total)}</h2>
-          <button className="btn btn-accent btn-lg" disabled={submitting} onClick={handleCheckout}>
-            {submitting ? 'Procesando...' : 'Hacer pedido'}
-          </button>
-        </div>
-      </>
-    );
+    return renderCartItems(items, 'precio_unitario', 'producto_id');
   }
 
   return (
-    <div className="container section">
-      <h1>Carrito de Compras</h1>
-      {usuario ? renderAuthCart() : renderGuestCart()}
-      <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-        {usuario ? (
-          <>
+    <div className="cart-section">
+      <div className="container">
+        <h1>Carrito de Compras</h1>
+        {usuario ? renderAuthCart() : renderGuestCart()}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          {usuario ? (
             <Link to="/productos" className="btn btn-outline">Seguir comprando</Link>
-          </>
-        ) : (
-          <p style={{ color: 'var(--gray-500)', fontSize: '0.875rem' }}>
-            ¿Ya tienes cuenta? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>Inicia sesión</Link> para guardar tu carrito.
-          </p>
-        )}
+          ) : (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem' }}>
+              ¿Ya tienes cuenta? <Link to="/login" style={{ color: 'var(--text)', fontWeight: 600 }}>Inicia sesión</Link> para guardar tu carrito.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

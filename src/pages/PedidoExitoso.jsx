@@ -4,31 +4,28 @@ export default function PedidoExitoso() {
   const { id } = useParams();
 
   return (
-    <div className="container section" style={{ textAlign: 'center', maxWidth: 500, margin: '0 auto' }}>
-      <div style={{
-        width: 64, height: 64,
-        background: '#16a34a', borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        margin: '0 auto 1.5rem', fontSize: '2rem', color: 'white', fontWeight: 'bold'
-      }}>
-        &#10003;
-      </div>
-      <h1>¡Pedido confirmado!</h1>
-      <p style={{ color: 'var(--gray-600)', marginBottom: '1.5rem', fontSize: '1.05rem' }}>
-        Gracias por tu compra. Tu pedido <strong>#{id}</strong> ha sido registrado.
-      </p>
-      <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <a
-          href={`/api/pedidos/${id}/boleta`}
-          target="_blank"
-          className="btn btn-accent btn-lg"
-          rel="noreferrer"
-        >
-          Ver boleta
-        </a>
-        <Link to="/productos" className="btn btn-primary btn-lg">
-          Seguir comprando
-        </Link>
+    <div className="order-success">
+      <div className="container" style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div className="order-success-icon">&#10003;</div>
+        <h1>¡Pedido confirmado!</h1>
+        <p>
+          Gracias por tu compra. Tu pedido <strong>#{id}</strong> ha sido registrado.
+          Te contactaremos pronto para coordinar el pago y envío.
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
+          <a
+            href={`/api/pedidos/${id}/boleta`}
+            target="_blank"
+            className="btn btn-accent btn-lg btn-block"
+            rel="noreferrer"
+            style={{ maxWidth: 320 }}
+          >
+            Ver boleta
+          </a>
+          <Link to="/productos" className="btn btn-primary btn-lg btn-block" style={{ maxWidth: 320 }}>
+            Seguir comprando
+          </Link>
+        </div>
       </div>
     </div>
   );

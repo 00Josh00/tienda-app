@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { prefetch } from '../utils/prefetch';
@@ -44,82 +44,167 @@ function useCartCount() {
 export default function Header() {
   const { usuario, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const cartCount = useCartCount();
   const location = useLocation();
+  const overlayRef = useRef(null);
 
   useEffect(() => {
     getCategorias().then(setCategorias).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    setMenuOpen(false);
+    setDropdownOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  function closeMenu() { setMenuOpen(false); }
+
   const fashion = categorias.filter(c => fashionCats.includes(c.nombre));
   const otros = categorias.filter(c => otrosCats.includes(c.nombre));
+
+  function isActive(catId) {
+    return location.search === `?categoria=${catId}`;
+  }
+
+  const preloadProductos = () => prefetch(() => import('../pages/Productos'));
+  const preloadCarrito = () => prefetch(() => import('../pages/Carrito'));
+  const preloadLogin = () => prefetch(() => import('../pages/Login'));
 
   return (
     <header className="header">
       <div className="container">
         <div className="header-top">
-          <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
+          <button className="hamburger" onClick={() => setMenuOpen(true)} aria-label="Menú">
+            <span /><span /><span />
+          </button>
+          <Link to="/" className="logo" onClick={closeMenu}>
             <span className="logo-icon">J</span>
             Josh Store
           </Link>
-          <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú">
-            <span /><span /><span />
-          </button>
-          <nav className={`nav ${menuOpen ? 'open' : ''}`}>
-            <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>Inicio</Link>
+          <nav className="nav-desktop">
+            <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Inicio</Link>
             {fashion.map(cat => (
               <Link
                 key={cat.id}
                 to={`/productos?categoria=${cat.id}`}
-                className={`nav-link ${location.search === `?categoria=${cat.id}` ? 'active' : ''}`}
-                onClick={() => setMenuOpen(false)}
+                className={`nav-link ${isActive(cat.id) ? 'active' : ''}`}
+                onMouseEnter={preloadProductos}
               >
                 {cat.nombre}
               </Link>
             ))}
             {otros.length > 0 && (
               <div className="nav-dropdown">
-                <Link to="/productos" className={`nav-link ${location.pathname === '/productos' && !location.search ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>
+                <Link to="/productos" className={`nav-link ${location.pathname === '/productos' && !location.search ? 'active' : ''}`}>
                   Otros
                 </Link>
                 <div className="nav-dropdown-content">
                   {otros.map(cat => (
-                    <Link key={cat.id} to={`/productos?categoria=${cat.id}`} onClick={() => setMenuOpen(false)}>
+                    <Link key={cat.id} to={`/productos?categoria=${cat.id}`}>
                       {cat.nombre}
                     </Link>
                   ))}
                 </div>
               </div>
             )}
-            <div className="nav-right">
-              <Link to="/carrito" className="nav-icon" onClick={() => setMenuOpen(false)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="21" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                {cartCount > 0 && <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>}
-              </Link>
-              {!usuario && (
-                <Link to="/login" className="nav-icon" onClick={() => setMenuOpen(false)}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </Link>
-              )}
-              {usuario && (
-                <div className="nav-dropdown">
-                  <span className="nav-user" style={{ cursor: 'pointer' }}>{usuario.nombre}</span>
-                  <div className="nav-dropdown-content" style={{ right: 0, left: 'auto' }}>
-                    {usuario.rol === 'admin' && <Link to="/admin" onClick={() => setMenuOpen(false)}>Panel Admin</Link>}
-                    <button
-                      onClick={() => { logout(); setMenuOpen(false); }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500, borderRadius: 'var(--radius)', fontFamily: 'inherit', width: '100%', textAlign: 'left' }}
-                      onMouseEnter={e => e.target.style.background = 'var(--border-light)'}
-                      onMouseLeave={e => e.target.style.background = 'none'}
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </nav>
+          <div className="nav-right">
+            <Link to="/carrito" className="nav-icon" onMouseEnter={preloadCarrito}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="21" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              {cartCount > 0 && <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>}
+            </Link>
+            {!usuario && (
+              <Link to="/login" className="nav-icon" onMouseEnter={preloadLogin}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </Link>
+            )}
+            {usuario && (
+              <div className={`nav-dropdown ${dropdownOpen ? 'open' : ''}`}>
+                <span className="nav-user" onClick={() => setDropdownOpen(!dropdownOpen)}>{usuario.nombre}</span>
+                <div className="nav-dropdown-content" style={{ right: 0, left: 'auto' }}>
+                  {usuario.rol === 'admin' && <Link to="/admin">Panel Admin</Link>}
+                  <button onClick={() => { logout(); }}>Cerrar sesión</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} ref={overlayRef} onClick={closeMenu} />
+      <div className={`nav-mobile ${menuOpen ? 'open' : ''}`}>
+        <div className="nav-mobile-header">
+          <Link to="/" className="logo" onClick={closeMenu}>
+            <span className="logo-icon">J</span>
+            Josh Store
+          </Link>
+          <button className="nav-mobile-close" onClick={closeMenu} aria-label="Cerrar">&times;</button>
+        </div>
+
+        <div className="nav-mobile-section">Categorías</div>
+        {fashion.map(cat => (
+          <Link
+            key={cat.id}
+            to={`/productos?categoria=${cat.id}`}
+            className={`${isActive(cat.id) ? 'active' : ''}`}
+            onClick={closeMenu}
+          >
+            {cat.nombre}
+          </Link>
+        ))}
+
+        {otros.length > 0 && <div className="nav-mobile-section">Otros</div>}
+        {otros.map(cat => (
+          <Link
+            key={cat.id}
+            to={`/productos?categoria=${cat.id}`}
+            className={`${isActive(cat.id) ? 'active' : ''}`}
+            onClick={closeMenu}
+          >
+            {cat.nombre}
+          </Link>
+        ))}
+
+        <div className="nav-mobile-section">Productos</div>
+        <Link to="/productos" onClick={closeMenu}>Todos los productos</Link>
+
+        <div className="nav-mobile-section">Cuenta</div>
+        {usuario ? (
+          <>
+            <span style={{ padding: '0.625rem 0.75rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              {usuario.email}
+            </span>
+            {usuario.rol === 'admin' && (
+              <Link to="/admin" onClick={closeMenu}>Panel Admin</Link>
+            )}
+            <button className="nav-mobile-link" onClick={() => { logout(); closeMenu(); }}>
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" onClick={closeMenu} onMouseEnter={preloadLogin}>Iniciar sesión</Link>
+            <Link to="/registro" onClick={closeMenu}>Registrarse</Link>
+          </>
+        )}
+
+        <div className="nav-mobile-footer">
+          <Link to="/carrito" className="nav-mobile-link" onClick={closeMenu}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '0.5rem' }}><circle cx="8" cy="21" r="1"/><circle cx="21" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Carrito {cartCount > 0 && `(${cartCount})`}
+          </Link>
         </div>
       </div>
     </header>

@@ -64,10 +64,11 @@ export default function ProductoDetalle() {
   if (!producto) return null;
 
   const { nombre, descripcion, precio, stock, imagen_url, categoria } = producto;
+  const agotado = stock === 0;
 
   return (
-    <div className="container section">
-      <Link to="/productos" className="back-link">&larr; Volver a productos</Link>
+    <div className="container section" style={{ paddingBottom: agotado ? '2rem' : '5rem' }}>
+      <Link to="/productos" className="back-link">&larr; Volver</Link>
       <div className="producto-detalle">
         <div className="producto-detalle-image">
           <img
@@ -80,18 +81,37 @@ export default function ProductoDetalle() {
           <h1>{nombre}</h1>
           <p className="product-price">{formatPrice(precio)}</p>
           <p className={`product-stock ${stock > 0 ? 'in-stock' : ''}`}>
-            {stock > 0 ? `Stock: ${stock} unidades` : 'Sin stock'}
+            {stock > 0 ? `Stock: ${stock} unidades` : 'Agotado'}
           </p>
           <p className="product-description">{descripcion || 'Sin descripción disponible.'}</p>
-          <button
-            className="btn btn-accent btn-lg"
-            disabled={stock === 0 || adding}
-            onClick={handleAdd}
-          >
-            {adding ? 'Agregando...' : stock > 0 ? 'Agregar al carrito' : 'Agotado'}
-          </button>
+          <div className="desktop-cart-btn">
+            <button
+              className="btn btn-accent btn-lg btn-block"
+              disabled={agotado || adding}
+              onClick={handleAdd}
+            >
+              {adding ? 'Agregando...' : agotado ? 'Agotado' : 'Agregar al carrito'}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Sticky bottom add to cart on mobile */}
+      {!agotado && (
+        <div className="sticky-bottom">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.8125rem' }}>{nombre}</span>
+            <span style={{ fontWeight: 700, fontSize: '1.125rem' }}>{formatPrice(precio)}</span>
+          </div>
+          <button
+            className="btn btn-accent btn-lg"
+            disabled={adding}
+            onClick={handleAdd}
+          >
+            {adding ? 'Agregando...' : 'Agregar al carrito'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
