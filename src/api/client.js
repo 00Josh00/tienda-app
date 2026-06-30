@@ -72,6 +72,24 @@ export function removeFromCarrito(producto_id) {
   return request(`/carrito/${producto_id}`, { method: 'DELETE' });
 }
 
+// Guest order (no auth)
+export function createGuestOrder(items, nombre, email, dni, idempotencyKey) {
+  return request('/pedidos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items, nombre, email, dni, idempotency_key: idempotencyKey }),
+  });
+}
+
+// Authenticated checkout (from cart)
+export function checkoutCart() {
+  return request('/pedidos/checkout', { method: 'POST' });
+}
+
+export function getBoletaUrl(id) {
+  return `${API_URL}/pedidos/${id}/boleta`;
+}
+
 // Admin
 export function getAdminProductos() {
   return request('/admin/productos');

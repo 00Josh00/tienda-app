@@ -22,7 +22,26 @@ export default function ProductoDetalle() {
   }, [id]);
 
   async function handleAdd() {
-    if (!usuario) { navigate('/login'); return; }
+    if (!usuario) {
+      const cart = JSON.parse(localStorage.getItem('guest_cart') || '[]');
+      const idx = cart.findIndex(i => i.producto_id === parseInt(id));
+      if (idx >= 0) {
+        if (cart[idx].cantidad >= producto.stock) return;
+        cart[idx].cantidad += 1;
+      } else {
+        cart.push({
+          producto_id: parseInt(id),
+          nombre: producto.nombre,
+          precio: producto.precio,
+          imagen_url: producto.imagen_url,
+          stock: producto.stock,
+          cantidad: 1,
+        });
+      }
+      localStorage.setItem('guest_cart', JSON.stringify(cart));
+      alert('Producto agregado al carrito');
+      return;
+    }
     setAdding(true);
     try {
       await addToCarrito(parseInt(id), 1);
