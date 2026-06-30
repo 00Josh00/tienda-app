@@ -36,11 +36,11 @@ export function authLogin(email, password) {
   });
 }
 
-export function authRegistro(nombre, email, password) {
+export function authRegistro(nombre, email, password, telefono) {
   return request('/auth/registro', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre, email, password }),
+    body: JSON.stringify({ nombre, email, password, telefono }),
   });
 }
 
@@ -73,11 +73,11 @@ export function removeFromCarrito(producto_id) {
 }
 
 // Guest order (no auth)
-export function createGuestOrder(items, nombre, email, dni, idempotencyKey) {
+export function createGuestOrder(items, nombre, email, dni, telefono, idempotencyKey) {
   return request('/pedidos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items, nombre, email, dni, idempotency_key: idempotencyKey }),
+    body: JSON.stringify({ items, nombre, email, dni, telefono, idempotency_key: idempotencyKey }),
   });
 }
 

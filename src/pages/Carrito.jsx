@@ -24,7 +24,7 @@ export default function Carrito() {
   const [loading, setLoading] = useState(true);
   const [guestCart, setGuestCartState] = useState([]);
   const [showCheckout, setShowCheckout] = useState(false);
-  const [form, setForm] = useState({ nombre: '', email: '', dni: '' });
+  const [form, setForm] = useState({ nombre: '', email: '', dni: '', telefono: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -122,7 +122,7 @@ export default function Carrito() {
     const idempotencyKey = uuid();
     try {
       const items = guestItems.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad }));
-      const result = await createGuestOrder(items, form.nombre, form.email, form.dni, idempotencyKey);
+      const result = await createGuestOrder(items, form.nombre, form.email, form.dni, form.telefono, idempotencyKey);
 
       localStorage.removeItem('guest_cart');
       window.dispatchEvent(new Event('cart-change'));
@@ -207,6 +207,10 @@ export default function Carrito() {
               <div className="form-group">
                 <label>DNI (8 dígitos)</label>
                 <input value={form.dni} onChange={e => setForm({ ...form, dni: e.target.value.replace(/\D/g, '').slice(0, 8) })} placeholder="12345678" required />
+              </div>
+              <div className="form-group">
+                <label>Teléfono</label>
+                <input value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })} placeholder="999888777" required />
               </div>
               <button className="btn btn-accent btn-lg btn-block" disabled={submitting}>
                 {submitting ? 'Procesando...' :                `Hacer pedido - ${formatPrice(guestTotal)}`}

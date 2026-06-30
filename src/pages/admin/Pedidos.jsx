@@ -34,6 +34,7 @@ export default function AdminPedidos() {
             <th>ID</th>
             <th>Cliente</th>
             <th>Email</th>
+            <th>Teléfono</th>
             <th>Total</th>
             <th>Estado</th>
             <th>Fecha</th>
@@ -46,6 +47,7 @@ export default function AdminPedidos() {
               <td>{p.id}</td>
               <td>{p.usuario}</td>
               <td>{p.email}</td>
+              <td>{p.telefono || '-'}</td>
               <td>{formatPrice(p.total)}</td>
               <td>
                 <span className="estado-badge" style={{ background: (estados[p.estado] || {}).color || '#64748b' }}>
@@ -59,7 +61,7 @@ export default function AdminPedidos() {
             </tr>
           ))}
           {pedidos.length === 0 && (
-            <tr><td colSpan={7} className="empty">No hay pedidos</td></tr>
+            <tr><td colSpan={8} className="empty">No hay pedidos</td></tr>
           )}
         </tbody>
       </table>

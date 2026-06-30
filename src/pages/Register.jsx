@@ -8,6 +8,7 @@ export default function Register() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +17,7 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
-      await register(nombre, email, password);
+      await register(nombre, email, password, telefono);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -38,6 +39,10 @@ export default function Register() {
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="telefono">Teléfono</label>
+            <input id="telefono" type="text" value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="999888777" required />
           </div>
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>

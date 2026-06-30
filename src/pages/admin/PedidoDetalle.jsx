@@ -38,7 +38,9 @@ export default function AdminPedidoDetalle() {
       <h1>Pedido #{pedido.id}</h1>
 
       <div className="pedido-info">
-        <p><strong>Cliente:</strong> {pedido.usuario} ({pedido.email})</p>
+        <p><strong>Cliente:</strong> {pedido.usuario}</p>
+        <p><strong>Email:</strong> {pedido.email}</p>
+        <p><strong>Teléfono:</strong> {pedido.telefono || '-'}</p>
         <p><strong>Fecha:</strong> {new Date(pedido.creado_en).toLocaleString()}</p>
         <p><strong>Total:</strong> {formatPrice(pedido.total)}</p>
         <p style={{ marginTop: '0.75rem' }}>
