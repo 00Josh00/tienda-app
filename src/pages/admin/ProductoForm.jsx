@@ -49,7 +49,7 @@ export default function ProductoForm({ producto, categorias, onClose }) {
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Precio</label>
+              <label>Precio (S/)</label>
               <input type="number" step="0.01" value={form.precio} onChange={e => setForm({ ...form, precio: e.target.value })} required />
             </div>
             <div className="form-group">

@@ -25,9 +25,9 @@ export default function Home() {
     <div>
       <section className="hero">
         <div className="container">
-          <h1>Bienvenido a Mi Tienda</h1>
-          <p>Los mejores productos al mejor precio — Envíos a todo el país</p>
-          <Link to="/productos" className="btn btn-primary btn-lg">Ver productos</Link>
+          <h1>Bienvenido a Josh Store</h1>
+          <p>Los mejores productos al mejor precio — Envíos a todo el Perú</p>
+          <Link to="/productos" className="btn btn-lg">Ver productos</Link>
         </div>
       </section>
 

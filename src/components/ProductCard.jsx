@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatPrice } from '../utils/format';
 
 export default function ProductCard({ producto }) {
   const { id, nombre, precio, imagen_url, categoria } = producto;
@@ -15,8 +16,8 @@ export default function ProductCard({ producto }) {
       <div className="product-card-body">
         {categoria && <span className="product-category">{categoria.nombre}</span>}
         <h3>{nombre}</h3>
-        <p className="product-price">${Number(precio).toFixed(2)}</p>
-        <Link to={`/productos/${id}`} className="btn btn-primary">Ver detalle</Link>
+        <p className="product-price">{formatPrice(precio)}</p>
+        <Link to={`/productos/${id}`} className="btn btn-primary btn-sm">Ver detalle</Link>
       </div>
     </div>
   );

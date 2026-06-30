@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getProducto, addToCarrito } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { formatPrice } from '../utils/format';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProductoDetalle() {
@@ -57,13 +58,13 @@ export default function ProductoDetalle() {
         <div className="producto-detalle-body">
           {categoria && <span className="product-category">{categoria.nombre}</span>}
           <h1>{nombre}</h1>
-          <p className="product-price">${Number(precio).toFixed(2)}</p>
-          <p className="product-stock">
+          <p className="product-price">{formatPrice(precio)}</p>
+          <p className={`product-stock ${stock > 0 ? 'in-stock' : ''}`}>
             {stock > 0 ? `Stock: ${stock} unidades` : 'Sin stock'}
           </p>
           <p className="product-description">{descripcion || 'Sin descripción disponible.'}</p>
           <button
-            className="btn btn-primary btn-lg"
+            className="btn btn-accent btn-lg"
             disabled={stock === 0 || adding}
             onClick={handleAdd}
           >

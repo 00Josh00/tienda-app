@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminPedidos } from '../../api/client';
+import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const estados = {
@@ -45,7 +46,7 @@ export default function AdminPedidos() {
               <td>{p.id}</td>
               <td>{p.usuario}</td>
               <td>{p.email}</td>
-              <td>${Number(p.total).toFixed(2)}</td>
+              <td>{formatPrice(p.total)}</td>
               <td>
                 <span className="estado-badge" style={{ background: (estados[p.estado] || {}).color || '#64748b' }}>
                   {estados[p.estado]?.label || p.estado}

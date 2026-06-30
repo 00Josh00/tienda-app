@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getAdminPedido, updateAdminPedidoEstado } from '../../api/client';
+import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 const estados = ['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'];
@@ -39,7 +40,7 @@ export default function AdminPedidoDetalle() {
       <div className="pedido-info">
         <p><strong>Cliente:</strong> {pedido.usuario} ({pedido.email})</p>
         <p><strong>Fecha:</strong> {new Date(pedido.creado_en).toLocaleString()}</p>
-        <p><strong>Total:</strong> ${Number(pedido.total).toFixed(2)}</p>
+        <p><strong>Total:</strong> {formatPrice(pedido.total)}</p>
       </div>
 
       <div className="estado-flow">
@@ -68,9 +69,9 @@ export default function AdminPedidoDetalle() {
           {pedido.items.map((item, i) => (
             <tr key={i}>
               <td>{item.nombre}</td>
-              <td>${item.precio_unitario.toFixed(2)}</td>
+              <td>{formatPrice(item.precio_unitario)}</td>
               <td>{item.cantidad}</td>
-              <td>${(item.cantidad * item.precio_unitario).toFixed(2)}</td>
+              <td>{formatPrice(item.cantidad * item.precio_unitario)}</td>
             </tr>
           ))}
         </tbody>

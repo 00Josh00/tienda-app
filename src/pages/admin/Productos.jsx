@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAdminProductos, deleteAdminProducto, getAdminCategorias } from '../../api/client';
+import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ProductoForm from './ProductoForm';
 
@@ -60,7 +61,7 @@ export default function AdminProductos() {
             <tr key={p.id} className={!p.activo ? 'inactive' : ''}>
               <td>{p.id}</td>
               <td>{p.nombre}</td>
-              <td>${Number(p.precio).toFixed(2)}</td>
+              <td>{formatPrice(p.precio)}</td>
               <td>{p.stock}</td>
               <td>{p.id_categoria}</td>
               <td>{p.activo ? '✓' : '✗'}</td>
