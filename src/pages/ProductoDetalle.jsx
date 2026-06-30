@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { getProducto } from '../api/client';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { getProducto, addToCarrito } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProductoDetalle() {
   const { id } = useParams();
+  const { usuario } = useAuth();
+  const navigate = useNavigate();
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     getProducto(id)
@@ -15,6 +19,19 @@ export default function ProductoDetalle() {
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleAdd() {
+    if (!usuario) { navigate('/login'); return; }
+    setAdding(true);
+    try {
+      await addToCarrito(parseInt(id), 1);
+      alert('Producto agregado al carrito');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setAdding(false);
+    }
+  }
 
   if (loading) return <LoadingSpinner />;
   if (error) return (
@@ -45,8 +62,12 @@ export default function ProductoDetalle() {
             {stock > 0 ? `Stock: ${stock} unidades` : 'Sin stock'}
           </p>
           <p className="product-description">{descripcion || 'Sin descripción disponible.'}</p>
-          <button className="btn btn-primary btn-lg" disabled={stock === 0}>
-            {stock > 0 ? 'Agregar al carrito' : 'Agotado'}
+          <button
+            className="btn btn-primary btn-lg"
+            disabled={stock === 0 || adding}
+            onClick={handleAdd}
+          >
+            {adding ? 'Agregando...' : stock > 0 ? 'Agregar al carrito' : 'Agotado'}
           </button>
         </div>
       </div>
