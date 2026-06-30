@@ -168,7 +168,7 @@ Output dir: `dist`
 ### Backend (OCI VM)
 
 ```bash
-ssh -i ssh-key -p 62820 ubuntu@<ip>
+ssh -i ssh-key ubuntu@<ip>
 source ~/.profile
 cd ~/api-tienda
 git pull   # o editar archivos directamente
