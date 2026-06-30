@@ -26,7 +26,7 @@ export default function Home() {
       <section className="hero">
         <div className="container">
           <h1>Bienvenido a Mi Tienda</h1>
-          <p>Los mejores productos al mejor precio</p>
+          <p>Los mejores productos al mejor precio — Envíos a todo el país</p>
           <Link to="/productos" className="btn btn-primary btn-lg">Ver productos</Link>
         </div>
       </section>
