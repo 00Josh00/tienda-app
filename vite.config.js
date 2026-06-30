@@ -12,7 +12,7 @@ export default defineConfig({
   },
 
   build: {
-    target: 'esnext',
+    target: 'baseline-widely-available',
     sourcemap: false,
     chunkSizeWarningLimit: 500,
     rollupOptions: {
@@ -23,8 +23,18 @@ export default defineConfig({
           if (id.includes('node_modules/react-router')) return 'vendor-router'
           if (id.includes('node_modules')) return 'vendor'
         },
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
+  },
+
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
+
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
 
   server: {

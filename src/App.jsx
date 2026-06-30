@@ -26,7 +26,8 @@ export default function App() {
         <div className="app">
           <Header />
           <main className="main">
-            <Suspense fallback={<LoadingSpinner />}>
+            <Suspense fallback={<LoadingSpinner skeleton />}>
+              <div className="routes-wrapper">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<Productos />} />
@@ -44,6 +45,7 @@ export default function App() {
                   </Route>
                 </Route>
               </Routes>
+              </div>
             </Suspense>
           </main>
           <Footer />
