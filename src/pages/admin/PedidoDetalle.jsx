@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { sileo } from 'sileo';
 import { getAdminPedido, updateAdminPedidoEstado, deleteAdminPedido } from '../../api/client';
 import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -28,13 +29,17 @@ export default function AdminPedidoDetalle() {
   }
 
   async function handleDelete() {
-    if (!confirm(`¿Eliminar pedido #${pedido.id} permanentemente?`)) return;
-    try {
-      await deleteAdminPedido(pedido.id);
-      navigate('/admin/pedidos');
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
+    sileo.action({
+      title: `¿Eliminar pedido #${pedido.id} permanentemente?`,
+      button: { onClick: async () => {
+        try {
+          await deleteAdminPedido(pedido.id);
+          navigate('/admin/pedidos');
+        } catch (err) {
+          sileo.error({ title: err.message });
+        }
+      } }
+    });
   }
 
   if (loading) return <LoadingSpinner />;

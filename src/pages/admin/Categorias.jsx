@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { sileo } from 'sileo';
 import { getAdminCategorias, createAdminCategoria, updateAdminCategoria, deleteAdminCategoria } from '../../api/client';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
@@ -46,14 +47,15 @@ export default function AdminCategorias() {
       resetForm();
       cargar();
     } catch (err) {
-      alert(err.message);
+      sileo.error({ title: err.message });
     }
   }
 
   async function handleEliminar(id) {
-    if (!confirm('¿Eliminar categoría?')) return;
-    await deleteAdminCategoria(id);
-    cargar();
+    sileo.action({
+      title: '¿Eliminar categoría?',
+      button: { onClick: async () => { await deleteAdminCategoria(id); cargar(); } }
+    });
   }
 
   if (loading) return <LoadingSpinner />;

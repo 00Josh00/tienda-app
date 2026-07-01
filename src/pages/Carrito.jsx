@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { sileo } from 'sileo';
 import { useAuth } from '../context/AuthContext';
 import { getCarrito, updateCarrito, removeFromCarrito, addToCarrito, checkoutCart, createGuestOrder } from '../api/client';
 import { formatPrice } from '../utils/format';
@@ -66,7 +67,7 @@ export default function Carrito() {
         const actualizado = await updateCarrito(productoId, nueva);
         setCarrito(actualizado);
       } catch (err) {
-        alert(err.message);
+        sileo.error({ title: err.message });
       }
     } else {
       const items = getGuestCart();
@@ -87,7 +88,7 @@ export default function Carrito() {
         const actualizado = await removeFromCarrito(productoId);
         setCarrito(actualizado);
       } catch (err) {
-        alert(err.message);
+        sileo.error({ title: err.message });
       }
     } else {
       const items = getGuestCart().filter(i => i.producto_id !== productoId);
@@ -109,7 +110,7 @@ export default function Carrito() {
       window.dispatchEvent(new Event('cart-change'));
       cargarCarrito();
     } catch (err) {
-      alert(err.message);
+      sileo.error({ title: err.message });
     }
   }
 
@@ -144,7 +145,7 @@ export default function Carrito() {
       const result = await checkoutCart();
       navigate(`/pedido-exitoso/${result.id}`);
     } catch (err) {
-      alert(err.message);
+      sileo.error({ title: err.message });
     } finally {
       setSubmitting(false);
     }

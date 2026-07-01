@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { sileo } from 'sileo';
 import { getAdminProductos, deleteAdminProducto, getAdminCategorias } from '../../api/client';
 import { formatPrice } from '../../utils/format';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -22,9 +23,10 @@ export default function AdminProductos() {
   useEffect(() => { cargar(); }, []);
 
   async function handleEliminar(id) {
-    if (!confirm('¿Eliminar producto?')) return;
-    await deleteAdminProducto(id);
-    cargar();
+    sileo.action({
+      title: '¿Eliminar producto?',
+      button: { onClick: async () => { await deleteAdminProducto(id); cargar(); } }
+    });
   }
 
   if (loading) return <LoadingSpinner />;

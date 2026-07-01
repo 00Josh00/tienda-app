@@ -1,34 +1,24 @@
 const oracledb = require("oracledb");
 
-const passwords = [
-  "Admin123!",
-  "Admin123",
-  "Welcome1",
-  "welcome1",
-  "oracle",
-  "Oracle123",
-  "Oracle123!",
-  "2o2o$$lJloseph",
-  "admin",
-  "Admin_123",
-];
+const oracledb = require("oracledb");
 
 (async () => {
-  for (const pwd of passwords) {
-    try {
-      const c = await oracledb.getConnection({
-        user: "ADMIN",
-        password: pwd,
-        connectionString: process.env.DB_CONNECTION_STRING,
-      });
-      console.log("CONNECTED AS ADMIN with password: " + pwd);
-      var r = await c.execute("SELECT 1 FROM dual");
-      console.log("  Query OK: " + JSON.stringify(r.rows));
-      await c.close();
-      process.exit(0);
-    } catch (e) {
-      console.log("FAIL: '" + pwd + "' - " + e.message.substring(0, 60));
-    }
+  const pwd = process.env.DB_ADMIN_PASSWORD;
+  if (!pwd) {
+    console.log("Define DB_ADMIN_PASSWORD en ~/.profile");
+    process.exit(1);
   }
-  console.log("Ninguna contraseña funciono");
+  try {
+    const c = await oracledb.getConnection({
+      user: "ADMIN",
+      password: pwd,
+      connectionString: process.env.DB_CONNECTION_STRING,
+    });
+    console.log("CONNECTED AS ADMIN");
+    var r = await c.execute("SELECT 1 FROM dual");
+    console.log("  Query OK: " + JSON.stringify(r.rows));
+    await c.close();
+  } catch (e) {
+    console.log("FAIL: " + e.message.substring(0, 60));
+  }
 })();

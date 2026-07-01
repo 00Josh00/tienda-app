@@ -223,10 +223,23 @@ router.get("/pedidos/:id", async (req, res) => {
     await rs.close();
     if (rows.length === 0) return res.status(404).json({ error: "No encontrado" });
     const r = rows[0];
+    const itemsResult = await conn.execute(
+      `BEGIN :cur := pkg_pedidos.obtener_items(:pid); END;`,
+      {
+        cur: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+        pid: parseInt(req.params.id)
+      }
+    );
+    const itemsRs = itemsResult.outBinds.cur;
+    const itemsRows = await itemsRs.getRows();
+    await itemsRs.close();
     res.json({
       id: r[0], id_usuario: r[1], usuario: r[2], email: r[3],
       telefono: r[4], guest_dni: r[5], total: Number(r[6]), estado: r[7],
-      creado_en: r[8]
+      creado_en: r[8],
+      items: itemsRows.map(item => ({
+        nombre: item[3], precio_unitario: Number(item[2]), cantidad: item[1]
+      }))
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
