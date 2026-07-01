@@ -18,9 +18,10 @@ E-commerce peruano construido con **React + Vite** (frontend) desplegado en **Cl
 | Capa | Tecnología |
 |------|-----------|
 | Frontend | React 19, Vite 8, React Router |
-| Backend | Node.js, Express 5 |
-| Base de datos | Oracle Autonomous Transaction Processing (ATP) |
-| ORM | oracledb (Thin mode, sin Instant Client) |
+ | Backend | Node.js, Express 5 |
+ | Base de datos | Oracle Autonomous Transaction Processing (ATP) |
+ | ORM | oracledb (Thin mode, sin Instant Client) |
+ | Lógica de negocio | PL/SQL Packages (Oracle) |
 | Auth | JWT + bcryptjs |
 | Edge | Cloudflare Pages + Pages Functions (proxy API) |
 | Tunnel | Cloudflare Tunnel (cloudflared) |
@@ -36,10 +37,12 @@ Cliente → josh-store.pages.dev (Cloudflare Pages)
                 ↓
     Cloudflare Tunnel (cloudflared)
                 ↓
-    OCI VM:8080 → Express API → Oracle ATP
+    OCI VM:8080 → Express API → Oracle ATP (PL/SQL)
 ```
 
 El frontend React se sirve desde Cloudflare Pages. Las rutas `/api/*` son interceptadas por una Pages Function que reenvía las peticiones al backend a través de un túnel Cloudflare, eliminando problemas de mixed content.
+
+La lógica de negocio (validaciones, cálculos, transacciones) se ejecuta dentro de Oracle ATP mediante **PL/SQL Packages**, reduciendo la carga de CPU/memoria en la VM. Cada operación de la API se traduce a 1 sola llamada PL/SQL en lugar de 3-5 queries separadas.
 
 ## Instalación y desarrollo local
 
@@ -94,7 +97,7 @@ El frontend se levantará en `http://localhost:5173` y proxy las llamadas API a 
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/api/productos` | Listar productos (opcional `?categoria=ID`) |
+| GET | `/api/productos` | Listar productos (`?categoria=ID`, `?genero=mujer\|hombre`) |
 | GET | `/api/productos/:id` | Detalle de producto |
 | GET | `/api/categorias` | Listar categorías |
 | GET | `/api/categorias/:id` | Detalle de categoría |
@@ -130,20 +133,65 @@ El frontend se levantará en `http://localhost:5173` y proxy las llamadas API a 
 | GET | `/api/admin/pedidos` | Listar pedidos |
 | GET | `/api/admin/pedidos/:id` | Detalle de pedido |
 | PUT | `/api/admin/pedidos/:id/estado` | Cambiar estado |
+| DELETE | `/api/admin/pedidos/:id` | Eliminar pedido |
 
-### Base de Datos (Oracle)
+### Base de Datos (Oracle ATP)
 
 ```sql
 -- Tablas principales
-CATEGORIAS (id, nombre, descripcion, imagen_url)
-PRODUCTOS (id, nombre, descripcion, precio, stock, imagen_url, id_categoria, activo, creado_en)
-USUARIOS (id, nombre, email, password_hash, rol, telefono)
-PEDIDOS (id, id_usuario, total, estado, direccion_envio, creado_en,
-         guest_nombre, guest_email, guest_dni, guest_telefono, idempotency_key)
+CATEGORIAS (id, nombre, descripcion, imagen_url, creado_en)
+PRODUCTOS  (id, nombre, descripcion, precio, stock, imagen_url,
+            id_categoria, activo, creado_en, genero)
+USUARIOS   (id, nombre, email, password_hash, rol, telefono, creado_en)
+PEDIDOS    (id, id_usuario, total, estado, creado_en,
+            guest_nombre, guest_email, guest_dni, guest_telefono, idempotency_key)
 DETALLE_PEDIDO (id, id_pedido, id_producto, cantidad, precio_unitario)
+PEDIDOS_AUDIT  (id, pedido_id, estado_anterior, estado_nuevo, cambiado_por, creado_en)
 ```
 
 Estados de pedido: `pendiente → confirmado → enviado → entregado` (o `cancelado` en cualquier paso).
+
+### PL/SQL Packages
+
+La lógica de negocio se implementa en packages Oracle dentro del ATP, minimizando los round-trips entre Node.js y la base de datos.
+
+| Package | Funcionalidad |
+|---------|---------------|
+| `pkg_productos` | CRUD de productos y categorías, listado con filtros (`?categoria=`, `?genero=`) |
+| `pkg_carrito` | Carrito de compras: obtener/crear, agregar items, actualizar cantidad, eliminar |
+| `kg_pedidos` | Creación de pedidos (guest con JSON items + validación DNI + idempotency key), checkout desde carrito, consulta de pedidos |
+| `pkg_auth` | Registro de usuarios, login, perfil, verificación de email duplicado |
+| `pkg_admin` | Listado/detalle de pedidos, cambio de estado, eliminación, estadísticas del dashboard |
+
+### Triggers
+
+| Trigger | Propósito |
+|---------|-----------|
+| `trg_productos_stock_check` | Evita stock negativo al actualizar productos |
+| `trg_productos_genero` | Auto-asigna `genero` (`mujer`/`hombre`) según el `id_categoria` |
+| `trg_pedidos_guest_validate` | Valida formato DNI (8 dígitos) al insertar pedidos guest |
+| `trg_pedidos_creado_en` | Auto-asigna `CURRENT_TIMESTAMP` si no se provee `creado_en` |
+| `trg_pedidos_estado_audit` | Registra cambios de estado en `pedidos_audit` |
+| `trg_categorias_delete_check` | Evita eliminar categorías con productos activos |
+
+### Esquema de llamadas PL/SQL desde Node.js
+
+Cada ruta de la API ejecuta un bloque anónimo PL/SQL con binds nombrados:
+
+```javascript
+// Ejemplo: listar productos con filtro de género
+const result = await conn.execute(
+  `BEGIN :cur := pkg_productos.listar(:cat, :gen); END;`,
+  {
+    cur: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
+    cat: req.query.categoria || null,
+    gen: req.query.genero || null
+  }
+);
+const rs = result.outBinds.cur;
+const rows = await rs.getRows();
+await rs.close();
+```
 
 ## Flujo de compra
 
@@ -176,6 +224,23 @@ pm2 restart api-tienda
 ```
 
 El backend corre con PM2 como servicio systemd para auto-reinicio.
+
+### PL/SQL Packages
+
+Los packages y triggers se despliegan directamente en Oracle ATP:
+
+```bash
+# Desde la máquina local
+scp scripts/plsql/packages.sql ubuntu@<vm-ip>:/tmp/packages.sql
+ssh ubuntu@<vm-ip>
+
+# En el VM
+source ~/.profile
+cd ~/api-tienda
+node scripts/plsql/run_plsql.cjs   # Ejecuta packages.sql contra el ATP
+```
+
+Requiere que el usuario `APP_TIENDA` tenga privilegios `CREATE PROCEDURE`, `CREATE TRIGGER` y `CREATE TYPE` (otorgados por `ADMIN`).
 
 ### Túnel Cloudflare
 
