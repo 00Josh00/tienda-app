@@ -34,6 +34,8 @@ export default function AdminPedidoDetalle() {
       description: `¿Estás seguro de eliminar el pedido #${pedido.id} permanentemente?`,
       duration: null,
       autopilot: false,
+      fill: '#dc2626',
+      styles: { badge: 'sileo-action-danger', title: 'sileo-danger-text', description: 'sileo-danger-text' },
       button: {
         title: 'Eliminar',
         onClick: async () => {

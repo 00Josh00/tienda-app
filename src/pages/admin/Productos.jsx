@@ -28,6 +28,8 @@ export default function AdminProductos() {
       description: '¿Estás seguro? Esta acción no se puede deshacer.',
       duration: null,
       autopilot: false,
+      fill: '#dc2626',
+      styles: { badge: 'sileo-action-danger', title: 'sileo-danger-text', description: 'sileo-danger-text' },
       button: {
         title: 'Eliminar',
         onClick: async () => {

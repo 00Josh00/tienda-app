@@ -1066,3 +1066,8 @@ h3 { font-size: 1rem; font-weight: 600; }
 /* Safe area for admin */
 .admin-content { padding-bottom: calc(1rem + var(--safe-bottom)); }
 @media (min-width: 768px) { .admin-content { padding-bottom: 2rem; } }
+
+/* Sileo danger action toast (delete confirmations) */
+.sileo-action-danger { --sileo-state-action: #dc2626; }
+.sileo-danger-text { color: #fff !important; }
+.sileo-danger-text[data-sileo-description] { color: rgba(255,255,255,0.85) !important; }
