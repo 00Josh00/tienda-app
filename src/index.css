@@ -172,6 +172,7 @@ h3 { font-size: 1rem; font-weight: 600; }
 }
 
 .nav-dropdown { position: relative; }
+.nav-dropdown-trigger { cursor: pointer; }
 .nav-dropdown-content {
   display: none;
   position: absolute;

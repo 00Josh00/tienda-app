@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { prefetch } from '../utils/prefetch';
 import { getCarrito, getCategorias } from '../api/client';
 
-const fashionCats = ['Blusas y Polos', 'Vestidos y Enterizos', 'Jeans y Pantalones', 'Chompas y Casacas', 'Faldas y Shorts', 'Accesorios'];
-const otrosCats = ['Electrónica', 'Hogar', 'Deportes', 'Libros', 'Ropa'];
+const womenCatNames = ['Blusas y Polos', 'Vestidos y Enterizos', 'Jeans y Pantalones', 'Chompas y Casacas', 'Faldas y Shorts', 'Accesorios'];
+const menCatNames = ['Camisas y Polos', 'Casacas y Chompas', 'Pantalones', 'Shorts', 'Accesorios Hombre'];
 
 function useCartCount() {
   const { usuario } = useAuth();
@@ -70,8 +70,8 @@ export default function Header() {
 
   function closeMenu() { setMenuOpen(false); }
 
-  const fashion = categorias.filter(c => fashionCats.includes(c.nombre));
-  const otros = categorias.filter(c => otrosCats.includes(c.nombre));
+  const womenCats = categorias.filter(c => womenCatNames.includes(c.nombre));
+  const menCats = categorias.filter(c => menCatNames.includes(c.nombre));
 
   function isActive(catId) {
     return location.search === `?categoria=${catId}`;
@@ -94,23 +94,23 @@ export default function Header() {
           </Link>
           <nav className="nav-desktop">
             <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Inicio</Link>
-            {fashion.map(cat => (
-              <Link
-                key={cat.id}
-                to={`/productos?categoria=${cat.id}`}
-                className={`nav-link ${isActive(cat.id) ? 'active' : ''}`}
-                onMouseEnter={preloadProductos}
-              >
-                {cat.nombre}
-              </Link>
-            ))}
-            {otros.length > 0 && (
+            {womenCats.length > 0 && (
               <div className="nav-dropdown">
-                <Link to="/productos" className={`nav-link ${location.pathname === '/productos' && !location.search ? 'active' : ''}`}>
-                  Otros
-                </Link>
+                <span className="nav-link nav-dropdown-trigger">Mujeres</span>
                 <div className="nav-dropdown-content">
-                  {otros.map(cat => (
+                  {womenCats.map(cat => (
+                    <Link key={cat.id} to={`/productos?categoria=${cat.id}`}>
+                      {cat.nombre}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            {menCats.length > 0 && (
+              <div className="nav-dropdown">
+                <span className="nav-link nav-dropdown-trigger">Hombres</span>
+                <div className="nav-dropdown-content">
+                  {menCats.map(cat => (
                     <Link key={cat.id} to={`/productos?categoria=${cat.id}`}>
                       {cat.nombre}
                     </Link>
@@ -142,7 +142,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} ref={overlayRef} onClick={closeMenu} />
       <div className={`nav-mobile ${menuOpen ? 'open' : ''}`}>
         <div className="nav-mobile-header">
@@ -153,8 +152,8 @@ export default function Header() {
           <button className="nav-mobile-close" onClick={closeMenu} aria-label="Cerrar">&times;</button>
         </div>
 
-        <div className="nav-mobile-section">Categorías</div>
-        {fashion.map(cat => (
+        <div className="nav-mobile-section">Mujeres</div>
+        {womenCats.map(cat => (
           <Link
             key={cat.id}
             to={`/productos?categoria=${cat.id}`}
@@ -165,8 +164,8 @@ export default function Header() {
           </Link>
         ))}
 
-        {otros.length > 0 && <div className="nav-mobile-section">Otros</div>}
-        {otros.map(cat => (
+        <div className="nav-mobile-section">Hombres</div>
+        {menCats.map(cat => (
           <Link
             key={cat.id}
             to={`/productos?categoria=${cat.id}`}
