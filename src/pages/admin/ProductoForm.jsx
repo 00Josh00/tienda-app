@@ -11,8 +11,7 @@ export default function ProductoForm({ producto, categorias, onClose }) {
     imagen_url: producto?.imagen_url || '',
     id_categoria: producto?.id_categoria || '',
     activo: producto?.activo ?? true,
-    ind_h: producto?.ind_h === 'S',
-    ind_m: producto?.ind_m === 'S',
+    genero: producto?.ind_h === 'S' && producto?.ind_m === 'N' ? 'hombre' : producto?.ind_m === 'S' && producto?.ind_h === 'N' ? 'mujer' : '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -22,10 +21,16 @@ export default function ProductoForm({ producto, categorias, onClose }) {
     setSaving(true);
     setError('');
     try {
+      const payload = {
+        ...form,
+        ind_h: form.genero === 'hombre' ? 'S' : 'N',
+        ind_m: form.genero === 'mujer' ? 'S' : 'N',
+      };
+      delete payload.genero;
       if (isEdit) {
-        await updateAdminProducto(producto.id, form);
+        await updateAdminProducto(producto.id, payload);
       } else {
-        await createAdminProducto(form);
+        await createAdminProducto(payload);
       }
       onClose();
     } catch (err) {
@@ -72,19 +77,13 @@ export default function ProductoForm({ producto, categorias, onClose }) {
             <label>Imagen URL</label>
             <input value={form.imagen_url} onChange={e => setForm({ ...form, imagen_url: e.target.value })} />
           </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input type="checkbox" checked={form.ind_h} onChange={e => setForm({ ...form, ind_h: e.target.checked })} />
-                Hombre
-              </label>
-            </div>
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input type="checkbox" checked={form.ind_m} onChange={e => setForm({ ...form, ind_m: e.target.checked })} />
-                Mujer
-              </label>
-            </div>
+          <div className="form-group">
+            <label>Género</label>
+            <select value={form.genero} onChange={e => setForm({ ...form, genero: e.target.value })}>
+              <option value="">Seleccionar...</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+            </select>
           </div>
           {isEdit && (
             <div className="form-group">
