@@ -24,7 +24,10 @@ export default function AdminProductos() {
 
   async function handleEliminar(id) {
     sileo.action({
-      title: '¿Eliminar producto?',
+      title: 'Eliminar producto',
+      description: '¿Estás seguro? Esta acción no se puede deshacer.',
+      duration: null,
+      autopilot: false,
       button: { title: 'Eliminar', onClick: () => { deleteAdminProducto(id).then(cargar); } }
     });
   }

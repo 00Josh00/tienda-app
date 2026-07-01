@@ -26,7 +26,10 @@ export default function AdminPedidos() {
 
   async function handleDelete(id, nombre) {
     sileo.action({
-      title: `¿Eliminar pedido #${id}${nombre ? ' de ' + nombre : ''}?`,
+      title: 'Eliminar pedido',
+      description: `¿Estás seguro de eliminar el pedido #${id}${nombre ? ' de ' + nombre : ''}?`,
+      duration: null,
+      autopilot: false,
       button: { title: 'Eliminar', onClick: () => {
         deleteAdminPedido(id)
           .then(() => setPedidos(pedidos.filter(p => p.id !== id)))

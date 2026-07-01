@@ -53,7 +53,10 @@ export default function AdminCategorias() {
 
   async function handleEliminar(id) {
     sileo.action({
-      title: '¿Eliminar categoría?',
+      title: 'Eliminar categoría',
+      description: '¿Estás seguro? Esta acción no se puede deshacer.',
+      duration: null,
+      autopilot: false,
       button: { title: 'Eliminar', onClick: () => { deleteAdminCategoria(id).then(cargar); } }
     });
   }
