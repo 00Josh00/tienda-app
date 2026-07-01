@@ -203,7 +203,7 @@ router.get("/:id/boleta", async (req, res) => {
 <body>
   <div class="boleta">
     <h1>JOSH STORE</h1>
-    <p class="subtitle">RUC: 10764537756<br>Alfonso Ugarte Mz G1 Lote 2, San Juan de Miraflores</p>
+    <p class="subtitle">RUC: 10764537756<br>Tienda Virtual</p>
 
     <div class="header-info">
       <p><strong>BOLETA N\u00b0</strong> ${String(r[0]).padStart(6, "0")}</p>
