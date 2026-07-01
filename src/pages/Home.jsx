@@ -4,9 +4,6 @@ import { getProductos, getCategorias } from '../api/client';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const womenCatNames = ['Blusas y Polos', 'Vestidos y Enterizos', 'Jeans y Pantalones', 'Chompas y Casacas', 'Faldas y Shorts', 'Accesorios'];
-const menCatNames = ['Camisas y Polos', 'Casacas y Chompas', 'Pantalones', 'Shorts', 'Accesorios Hombre'];
-
 export default function Home() {
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
@@ -24,13 +21,8 @@ export default function Home() {
 
   if (loading) return <LoadingSpinner />;
 
-  const womenCats = categorias.filter(c => womenCatNames.includes(c.nombre));
-  const menCats = categorias.filter(c => menCatNames.includes(c.nombre));
-  const womenIds = womenCats.map(c => c.id);
-  const menIds = menCats.map(c => c.id);
-
-  const womenProducts = productos.filter(p => p.categoria && womenIds.includes(p.categoria.id)).slice(0, 8);
-  const menProducts = productos.filter(p => p.categoria && menIds.includes(p.categoria.id)).slice(0, 8);
+  const womenProducts = productos.filter(p => p.ind_m === 'S').slice(0, 8);
+  const menProducts = productos.filter(p => p.ind_h === 'S').slice(0, 8);
 
   return (
     <div>
@@ -67,7 +59,7 @@ export default function Home() {
           </div>
           <p className="section-subtitle">Descubre nuestra colección femenina</p>
           <div className="categorias-grid">
-            {womenCats.map(cat => (
+            {categorias.map(cat => (
               <Link key={cat.id} to={`/productos?categoria=${cat.id}`} className="categoria-card">
                 <h3>{cat.nombre}</h3>
                 <p>Ver colección</p>
@@ -101,7 +93,7 @@ export default function Home() {
           </div>
           <p className="section-subtitle">Explora nuestra colección masculina</p>
           <div className="categorias-grid">
-            {menCats.map(cat => (
+            {categorias.map(cat => (
               <Link key={cat.id} to={`/productos?categoria=${cat.id}`} className="categoria-card">
                 <h3>{cat.nombre}</h3>
                 <p>Ver colección</p>

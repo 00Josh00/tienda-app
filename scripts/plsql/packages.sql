@@ -28,7 +28,8 @@ CREATE OR REPLACE PACKAGE pkg_productos AS
     p_stock NUMBER DEFAULT 0,
     p_imagen_url VARCHAR2 DEFAULT NULL,
     p_id_categoria NUMBER,
-    p_genero VARCHAR2 DEFAULT NULL
+    p_ind_h CHAR DEFAULT 'N',
+    p_ind_m CHAR DEFAULT 'N'
   ) RETURN NUMBER;
 
   -- Update product
@@ -41,7 +42,8 @@ CREATE OR REPLACE PACKAGE pkg_productos AS
     p_imagen_url VARCHAR2 DEFAULT NULL,
     p_id_categoria NUMBER DEFAULT NULL,
     p_activo NUMBER DEFAULT NULL,
-    p_genero VARCHAR2 DEFAULT NULL
+    p_ind_h CHAR DEFAULT NULL,
+    p_ind_m CHAR DEFAULT NULL
   );
 
   -- Soft delete (deactivate)
@@ -81,7 +83,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
     v_sql VARCHAR2(2000);
   BEGIN
     v_sql := 'SELECT p.id, p.nombre, TO_CHAR(p.descripcion) AS descripcion,
-                     p.precio, p.stock, p.imagen_url, p.genero,
+                     p.precio, p.stock, p.imagen_url, p.ind_h, p.ind_m,
                      c.id AS categoria_id, c.nombre AS categoria_nombre
               FROM productos p, categorias c
               WHERE p.id_categoria = c.id AND p.activo = 1';
@@ -89,17 +91,15 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
     IF p_categoria_id IS NOT NULL THEN
       v_sql := v_sql || ' AND p.id_categoria = :cat';
     END IF;
-    IF p_genero IS NOT NULL THEN
-      v_sql := v_sql || ' AND p.genero = :gen';
+    IF p_genero = 'hombre' THEN
+      v_sql := v_sql || ' AND p.ind_h = ''S''';
+    ELSIF p_genero = 'mujer' THEN
+      v_sql := v_sql || ' AND p.ind_m = ''S''';
     END IF;
     v_sql := v_sql || ' ORDER BY p.creado_en DESC';
 
-    IF p_categoria_id IS NOT NULL AND p_genero IS NOT NULL THEN
-      OPEN c FOR v_sql USING p_categoria_id, p_genero;
-    ELSIF p_categoria_id IS NOT NULL THEN
+    IF p_categoria_id IS NOT NULL THEN
       OPEN c FOR v_sql USING p_categoria_id;
-    ELSIF p_genero IS NOT NULL THEN
-      OPEN c FOR v_sql USING p_genero;
     ELSE
       OPEN c FOR v_sql;
     END IF;
@@ -111,7 +111,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
   BEGIN
     OPEN c FOR
       SELECT p.id, p.nombre, TO_CHAR(p.descripcion) AS descripcion,
-             p.precio, p.stock, p.imagen_url, p.genero,
+             p.precio, p.stock, p.imagen_url, p.ind_h, p.ind_m,
              c.id AS categoria_id, c.nombre AS categoria_nombre
       FROM productos p, categorias c
       WHERE p.id_categoria = c.id AND p.id = p_id AND p.activo = 1;
@@ -125,12 +125,13 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
     p_stock NUMBER DEFAULT 0,
     p_imagen_url VARCHAR2 DEFAULT NULL,
     p_id_categoria NUMBER,
-    p_genero VARCHAR2 DEFAULT NULL
+    p_ind_h CHAR DEFAULT 'N',
+    p_ind_m CHAR DEFAULT 'N'
   ) RETURN NUMBER IS
     v_new_id NUMBER;
   BEGIN
-    INSERT INTO productos (nombre, descripcion, precio, stock, imagen_url, id_categoria, genero)
-    VALUES (p_nombre, p_descripcion, p_precio, p_stock, p_imagen_url, p_id_categoria, p_genero)
+    INSERT INTO productos (nombre, descripcion, precio, stock, imagen_url, id_categoria, ind_h, ind_m)
+    VALUES (p_nombre, p_descripcion, p_precio, p_stock, p_imagen_url, p_id_categoria, p_ind_h, p_ind_m)
     RETURNING id INTO v_new_id;
     COMMIT;
     RETURN v_new_id;
@@ -145,7 +146,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
     p_imagen_url VARCHAR2 DEFAULT NULL,
     p_id_categoria NUMBER DEFAULT NULL,
     p_activo NUMBER DEFAULT NULL,
-    p_genero VARCHAR2 DEFAULT NULL
+    p_ind_h CHAR DEFAULT NULL,
+    p_ind_m CHAR DEFAULT NULL
   ) IS
   BEGIN
     UPDATE productos SET
@@ -156,7 +158,8 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos AS
       imagen_url = NVL(p_imagen_url, imagen_url),
       id_categoria = NVL(p_id_categoria, id_categoria),
       activo = NVL(p_activo, activo),
-      genero = NVL(p_genero, genero)
+      ind_h = NVL(p_ind_h, ind_h),
+      ind_m = NVL(p_ind_m, ind_m)
     WHERE id = p_id;
     COMMIT;
   END actualizar;
@@ -824,18 +827,7 @@ BEGIN
 END;
 /
 
--- Trigger: Auto-set genero based on category on INSERT/UPDATE of productos
-CREATE OR REPLACE TRIGGER trg_productos_genero
-  BEFORE INSERT OR UPDATE OF id_categoria ON productos
-  FOR EACH ROW
-BEGIN
-  IF :NEW.id_categoria BETWEEN 12 AND 17 THEN
-    :NEW.genero := 'mujer';
-  ELSIF :NEW.id_categoria BETWEEN 18 AND 22 THEN
-    :NEW.genero := 'hombre';
-  END IF;
-END;
-/
+-- Trigger: trg_productos_genero was removed (genero column dropped in favor of ind_h/ind_m)
 
 -- Trigger: Validate DNI format on guest orders (pedidos)
 CREATE OR REPLACE TRIGGER trg_pedidos_guest_validate

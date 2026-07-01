@@ -4,12 +4,8 @@ import { getProductos, getCategorias } from '../api/client';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 
-const womenCatNames = ['Blusas y Polos', 'Vestidos y Enterizos', 'Jeans y Pantalones', 'Chompas y Casacas', 'Faldas y Shorts', 'Accesorios'];
-const menCatNames = ['Camisas y Polos', 'Casacas y Chompas', 'Pantalones', 'Shorts', 'Accesorios Hombre'];
-const allCatNames = [...new Set([...womenCatNames, ...menCatNames])];
-
 export default function Productos() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const categoriaId = searchParams.get('categoria');
   const genero = searchParams.get('genero');
   const [productos, setProductos] = useState([]);
@@ -17,6 +13,7 @@ export default function Productos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([getProductos(categoriaId, genero), getCategorias()])
       .then(([prods, cats]) => {
         setProductos(prods);
@@ -26,45 +23,56 @@ export default function Productos() {
       .finally(() => setLoading(false));
   }, [categoriaId, genero]);
 
-  let activeCats;
-  if (genero === 'mujer') {
-    activeCats = categorias.filter(c => womenCatNames.includes(c.nombre));
-  } else if (genero === 'hombre') {
-    activeCats = categorias.filter(c => menCatNames.includes(c.nombre));
-  } else {
-    activeCats = categorias.filter(c => allCatNames.includes(c.nombre));
+  function toggleGenero(val) {
+    const params = new URLSearchParams(searchParams);
+    if (genero === val) {
+      params.delete('genero');
+    } else {
+      params.set('genero', val);
+    }
+    setSearchParams(params);
   }
 
-  let title = 'Todos los productos';
-  if (genero === 'mujer') title = 'Mujeres';
-  else if (genero === 'hombre') title = 'Hombres';
-
   const selectedCat = categoriaId ? categorias.find(c => c.id === Number(categoriaId)) : null;
-  const selectedGenero = genero || 'todos';
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container section">
-      <h1>{selectedCat ? selectedCat.nombre : title}</h1>
+      <h1>{selectedCat ? selectedCat.nombre : 'Todos los productos'}</h1>
 
       <div className="gender-tabs">
-        <Link to="/productos" className={`gender-tab ${selectedGenero === 'todos' ? 'active' : ''}`}>Todos</Link>
-        <Link to="/productos?genero=mujer" className={`gender-tab ${selectedGenero === 'mujer' ? 'active' : ''}`}>Mujeres</Link>
-        <Link to="/productos?genero=hombre" className={`gender-tab ${selectedGenero === 'hombre' ? 'active' : ''}`}>Hombres</Link>
+        <button
+          className={`gender-tab ${!genero ? 'active' : ''}`}
+          onClick={() => { const p = new URLSearchParams(); setSearchParams(p); }}
+        >
+          Todos
+        </button>
+        <button
+          className={`gender-tab ${genero === 'mujer' ? 'active' : ''}`}
+          onClick={() => toggleGenero('mujer')}
+        >
+          Mujeres
+        </button>
+        <button
+          className={`gender-tab ${genero === 'hombre' ? 'active' : ''}`}
+          onClick={() => toggleGenero('hombre')}
+        >
+          Hombres
+        </button>
       </div>
 
       <div className="categorias-filter">
-        {genero && (
-          <Link to={`/productos?genero=${genero}`} className={`tag ${!categoriaId ? 'active' : ''}`}>Todo</Link>
-        )}
-        {!genero && (
-          <Link to="/productos" className={`tag ${!categoriaId ? 'active' : ''}`}>Todo</Link>
-        )}
-        {activeCats.map(cat => (
+        <Link
+          to={genero ? `/productos?genero=${genero}` : '/productos'}
+          className={`tag ${!categoriaId ? 'active' : ''}`}
+        >
+          Todo
+        </Link>
+        {categorias.map(cat => (
           <Link
             key={cat.id}
-            to={`/productos?${genero ? `genero=${genero}&` : ''}categoria=${cat.id}`}
+            to={genero ? `/productos?genero=${genero}&categoria=${cat.id}` : `/productos?categoria=${cat.id}`}
             className={`tag ${categoriaId === String(cat.id) ? 'active' : ''}`}
           >
             {cat.nombre}

@@ -2,7 +2,11 @@ import { Link } from 'react-router-dom';
 import { formatPrice } from '../utils/format';
 
 export default function ProductCard({ producto }) {
-  const { id, nombre, precio, imagen_url, categoria, genero } = producto;
+  const { id, nombre, precio, imagen_url, categoria, ind_h, ind_m } = producto;
+
+  const badges = [];
+  if (ind_h === 'S') badges.push('Hombre');
+  if (ind_m === 'S') badges.push('Mujer');
 
   return (
     <div className="product-card">
@@ -12,7 +16,9 @@ export default function ProductCard({ producto }) {
           alt={nombre}
           loading="lazy"
         />
-        {genero && <span className={`product-gender product-gender--${genero}`}>{genero === 'mujer' ? 'Mujer' : 'Hombre'}</span>}
+        {badges.length > 0 && badges.map(b => (
+          <span key={b} className={`product-gender product-gender--${b.toLowerCase()}`}>{b}</span>
+        ))}
       </div>
       <div className="product-card-body">
         {categoria && <span className="product-category">{categoria.nombre}</span>}

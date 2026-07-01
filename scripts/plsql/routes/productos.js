@@ -21,8 +21,9 @@ router.get('/', async (req, res) => {
     await rs.close();
     res.json(rows.map(r => ({
       id: r[0], nombre: r[1], descripcion: r[2],
-      precio: Number(r[3]), stock: r[4], imagen_url: r[5], genero: r[6],
-      categoria: { id: r[7], nombre: r[8] }
+      precio: Number(r[3]), stock: r[4], imagen_url: r[5],
+      ind_h: r[6], ind_m: r[7],
+      categoria: { id: r[8], nombre: r[9] }
     })));
   } catch (err) {
     res.status(500).json({ error: err.message || 'Error interno' });
@@ -49,8 +50,9 @@ router.get('/:id', async (req, res) => {
     const r = rows[0];
     res.json({
       id: r[0], nombre: r[1], descripcion: r[2],
-      precio: Number(r[3]), stock: r[4], imagen_url: r[5], genero: r[6],
-      categoria: { id: r[7], nombre: r[8] }
+      precio: Number(r[3]), stock: r[4], imagen_url: r[5],
+      ind_h: r[6], ind_m: r[7],
+      categoria: { id: r[8], nombre: r[9] }
     });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Error interno' });

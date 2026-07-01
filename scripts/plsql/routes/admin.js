@@ -23,8 +23,9 @@ router.get("/productos", async (req, res) => {
     await rs.close();
     res.json(rows.map(r => ({
       id: r[0], nombre: r[1], descripcion: r[2],
-      precio: Number(r[3]), stock: r[4], imagen_url: r[5], genero: r[6],
-      id_categoria: r[7], categoria_nombre: r[8]
+      precio: Number(r[3]), stock: r[4], imagen_url: r[5],
+      ind_h: r[6], ind_m: r[7],
+      id_categoria: r[8], categoria_nombre: r[9]
     })));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -36,10 +37,10 @@ router.get("/productos", async (req, res) => {
 router.post("/productos", async (req, res) => {
   let conn;
   try {
-    const { nombre, descripcion, precio, stock, imagen_url, id_categoria, genero } = req.body;
+    const { nombre, descripcion, precio, stock, imagen_url, id_categoria, ind_h, ind_m } = req.body;
     conn = await pool.getConnection();
     const result = await conn.execute(
-      `BEGIN :newid := pkg_productos.crear(:nom, :desc, :pre, :sto, :img, :cat, :gen); END;`,
+      `BEGIN :newid := pkg_productos.crear(:nom, :desc, :pre, :sto, :img, :cat, :ih, :im); END;`,
       {
         newid: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
         nom: nombre,
@@ -48,7 +49,8 @@ router.post("/productos", async (req, res) => {
         sto: stock || 0,
         img: imagen_url || null,
         cat: id_categoria,
-        gen: genero || null
+        ih: ind_h || 'N',
+        im: ind_m || 'N'
       }
     );
     res.status(201).json({ id: result.outBinds.newid });
@@ -62,10 +64,10 @@ router.post("/productos", async (req, res) => {
 router.put("/productos/:id", async (req, res) => {
   let conn;
   try {
-    const { nombre, descripcion, precio, stock, imagen_url, id_categoria, activo, genero } = req.body;
+    const { nombre, descripcion, precio, stock, imagen_url, id_categoria, activo, ind_h, ind_m } = req.body;
     conn = await pool.getConnection();
     await conn.execute(
-      `BEGIN pkg_productos.actualizar(:pid, :nom, :desc, :pre, :sto, :img, :cat, :act, :gen); END;`,
+      `BEGIN pkg_productos.actualizar(:pid, :nom, :desc, :pre, :sto, :img, :cat, :act, :ih, :im); END;`,
       {
         pid: parseInt(req.params.id),
         nom: nombre || null,
@@ -75,7 +77,8 @@ router.put("/productos/:id", async (req, res) => {
         img: imagen_url || null,
         cat: id_categoria || null,
         act: activo != null ? (activo ? 1 : 0) : null,
-        gen: genero || null
+        ih: ind_h || null,
+        im: ind_m || null
       }
     );
     res.json({ success: true });
