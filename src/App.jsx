@@ -25,7 +25,7 @@ const PedidoExitoso = lazy(() => import('./pages/PedidoExitoso'));
 export default function App() {
   return (
     <AuthProvider>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" offset={{ top: 60 }} />
       <BrowserRouter>
         <div className="app">
           <Header />
