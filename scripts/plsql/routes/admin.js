@@ -49,8 +49,8 @@ router.post("/productos", async (req, res) => {
         sto: stock || 0,
         img: imagen_url || null,
         cat: id_categoria,
-        ih: ind_h || 'N',
-        im: ind_m || 'N'
+        ih: ind_h ? 'S' : 'N',
+        im: ind_m ? 'S' : 'N'
       }
     );
     res.status(201).json({ id: result.outBinds.newid });
@@ -77,8 +77,8 @@ router.put("/productos/:id", async (req, res) => {
         img: imagen_url || null,
         cat: id_categoria || null,
         act: activo != null ? (activo ? 1 : 0) : null,
-        ih: ind_h || null,
-        im: ind_m || null
+        ih: ind_h != null ? (ind_h ? 'S' : 'N') : null,
+        im: ind_m != null ? (ind_m ? 'S' : 'N') : null
       }
     );
     res.json({ success: true });

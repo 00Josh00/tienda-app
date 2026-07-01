@@ -11,6 +11,8 @@ export default function ProductoForm({ producto, categorias, onClose }) {
     imagen_url: producto?.imagen_url || '',
     id_categoria: producto?.id_categoria || '',
     activo: producto?.activo ?? true,
+    ind_h: producto?.ind_h === 'S',
+    ind_m: producto?.ind_m === 'S',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -69,6 +71,20 @@ export default function ProductoForm({ producto, categorias, onClose }) {
           <div className="form-group">
             <label>Imagen URL</label>
             <input value={form.imagen_url} onChange={e => setForm({ ...form, imagen_url: e.target.value })} />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input type="checkbox" checked={form.ind_h} onChange={e => setForm({ ...form, ind_h: e.target.checked })} />
+                Hombre
+              </label>
+            </div>
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input type="checkbox" checked={form.ind_m} onChange={e => setForm({ ...form, ind_m: e.target.checked })} />
+                Mujer
+              </label>
+            </div>
           </div>
           {isEdit && (
             <div className="form-group">
