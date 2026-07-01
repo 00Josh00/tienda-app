@@ -506,6 +506,20 @@ h3 { font-size: 1rem; font-weight: 600; }
   object-fit: cover;
   transition: transform 0.4s;
 }
+.product-gender {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+.product-gender--mujer { background: rgba(236, 72, 153, 0.9); color: white; }
+.product-gender--hombre { background: rgba(59, 130, 246, 0.9); color: white; }
 .product-card-body {
   padding: 0.75rem;
   display: flex;
@@ -540,6 +554,45 @@ h3 { font-size: 1rem; font-weight: 600; }
   .product-price { font-size: 1.05rem; }
   .product-card:hover { box-shadow: var(--shadow-md); }
   .product-card:hover .product-card-image img { transform: scale(1.06); }
+}
+
+/* ========== GENDER TABS ========== */
+.gender-tabs {
+  display: flex;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+.gender-tab {
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.15s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.gender-tab:active,
+.gender-tab.active { background: var(--text); color: var(--bg-card); border-color: var(--text); }
+
+.gender-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.hero-links {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 /* ========== FILTER TAGS ========== */

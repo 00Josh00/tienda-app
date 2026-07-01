@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { formatPrice } from '../utils/format';
 
 export default function ProductCard({ producto }) {
-  const { id, nombre, precio, imagen_url, categoria } = producto;
+  const { id, nombre, precio, imagen_url, categoria, genero } = producto;
 
   return (
     <div className="product-card">
@@ -12,6 +12,7 @@ export default function ProductCard({ producto }) {
           alt={nombre}
           loading="lazy"
         />
+        {genero && <span className={`product-gender product-gender--${genero}`}>{genero === 'mujer' ? 'Mujer' : 'Hombre'}</span>}
       </div>
       <div className="product-card-body">
         {categoria && <span className="product-category">{categoria.nombre}</span>}

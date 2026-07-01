@@ -96,7 +96,7 @@ export default function Header() {
             <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Inicio</Link>
             {womenCats.length > 0 && (
               <div className="nav-dropdown">
-                <span className="nav-link nav-dropdown-trigger">Mujeres</span>
+                <Link to="/productos?genero=mujer" className={`nav-link ${location.search === '?genero=mujer' ? 'active' : ''}`}>Mujeres</Link>
                 <div className="nav-dropdown-content">
                   {womenCats.map(cat => (
                     <Link key={cat.id} to={`/productos?categoria=${cat.id}`}>
@@ -108,7 +108,7 @@ export default function Header() {
             )}
             {menCats.length > 0 && (
               <div className="nav-dropdown">
-                <span className="nav-link nav-dropdown-trigger">Hombres</span>
+                <Link to="/productos?genero=hombre" className={`nav-link ${location.search === '?genero=hombre' ? 'active' : ''}`}>Hombres</Link>
                 <div className="nav-dropdown-content">
                   {menCats.map(cat => (
                     <Link key={cat.id} to={`/productos?categoria=${cat.id}`}>
@@ -153,6 +153,9 @@ export default function Header() {
         </div>
 
         <div className="nav-mobile-section">Mujeres</div>
+        <Link to="/productos?genero=mujer" onClick={closeMenu}>
+          Todas las categorías
+        </Link>
         {womenCats.map(cat => (
           <Link
             key={cat.id}
@@ -165,6 +168,9 @@ export default function Header() {
         ))}
 
         <div className="nav-mobile-section">Hombres</div>
+        <Link to="/productos?genero=hombre" onClick={closeMenu}>
+          Todas las categorías
+        </Link>
         {menCats.map(cat => (
           <Link
             key={cat.id}

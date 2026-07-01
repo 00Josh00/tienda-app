@@ -38,12 +38,9 @@ export default function Home() {
         <div className="container">
           <h1>Nueva temporada</h1>
           <p>Descubre las últimas tendencias en moda. Estilo y calidad para hombres y mujeres.</p>
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {womenCats.map(cat => (
-              <Link key={cat.id} to={`/productos?categoria=${cat.id}`} className="btn btn-outline btn-sm">
-                {cat.nombre}
-              </Link>
-            ))}
+          <div className="hero-links">
+            <Link to="/productos?genero=mujer" className="btn btn-primary">Mujeres</Link>
+            <Link to="/productos?genero=hombre" className="btn btn-outline">Hombres</Link>
           </div>
           <div className="hero-badges">
             <span className="hero-badge">
@@ -64,7 +61,10 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <h2 className="section-title">Mujeres</h2>
+          <div className="gender-header">
+            <h2 className="section-title">Mujeres</h2>
+            <Link to="/productos?genero=mujer" className="btn btn-outline btn-sm">Ver todo</Link>
+          </div>
           <p className="section-subtitle">Descubre nuestra colección femenina</p>
           <div className="categorias-grid">
             {womenCats.map(cat => (
@@ -79,12 +79,9 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <div className="otros-header">
-            <div>
-              <h2 className="section-title" style={{ margin: 0 }}>Novedades</h2>
-              <p className="section-subtitle" style={{ margin: '0.25rem 0 0' }}>Lo último en moda femenina</p>
-            </div>
-            <Link to="/productos" className="btn btn-outline btn-sm">Ver más</Link>
+          <div className="gender-header">
+            <h2 className="section-title">Novedades Mujer</h2>
+            <Link to="/productos?genero=mujer" className="btn btn-outline btn-sm">Ver más</Link>
           </div>
           <div className="productos-grid">
             {womenProducts.map(p => (
@@ -98,7 +95,10 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <h2 className="section-title">Hombres</h2>
+          <div className="gender-header">
+            <h2 className="section-title">Hombres</h2>
+            <Link to="/productos?genero=hombre" className="btn btn-outline btn-sm">Ver todo</Link>
+          </div>
           <p className="section-subtitle">Explora nuestra colección masculina</p>
           <div className="categorias-grid">
             {menCats.map(cat => (
@@ -113,12 +113,9 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <div className="otros-header">
-            <div>
-              <h2 className="section-title" style={{ margin: 0 }}>Nuevos Ingresos</h2>
-              <p className="section-subtitle" style={{ margin: '0.25rem 0 0' }}>Moda masculina recién llegada</p>
-            </div>
-            <Link to="/productos" className="btn btn-outline btn-sm">Ver más</Link>
+          <div className="gender-header">
+            <h2 className="section-title">Novedades Hombre</h2>
+            <Link to="/productos?genero=hombre" className="btn btn-outline btn-sm">Ver más</Link>
           </div>
           <div className="productos-grid">
             {menProducts.map(p => (

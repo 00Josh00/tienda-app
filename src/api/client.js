@@ -15,8 +15,10 @@ async function request(path, opts = {}) {
   return res.json();
 }
 
-export function getProductos(categoriaId) {
-  const params = categoriaId ? `?categoria=${categoriaId}` : '';
+export function getProductos(categoriaId, genero) {
+  let params = '';
+  if (categoriaId) params += `?categoria=${categoriaId}`;
+  if (genero) params += `${params ? '&' : '?'}genero=${genero}`;
   return request(`/productos${params}`);
 }
 
