@@ -28,7 +28,18 @@ export default function AdminProductos() {
       description: '¿Estás seguro? Esta acción no se puede deshacer.',
       duration: null,
       autopilot: false,
-      button: { title: 'Eliminar', onClick: () => { deleteAdminProducto(id).then(cargar); } }
+      button: {
+        title: 'Eliminar',
+        onClick: async () => {
+          try {
+            await deleteAdminProducto(id);
+            sileo.info({ title: 'Producto eliminado' });
+            cargar();
+          } catch (err) {
+            sileo.error({ title: err.message || 'Error al eliminar' });
+          }
+        }
+      }
     });
   }
 

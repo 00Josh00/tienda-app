@@ -57,7 +57,18 @@ export default function AdminCategorias() {
       description: '¿Estás seguro? Esta acción no se puede deshacer.',
       duration: null,
       autopilot: false,
-      button: { title: 'Eliminar', onClick: () => { deleteAdminCategoria(id).then(cargar); } }
+      button: {
+        title: 'Eliminar',
+        onClick: async () => {
+          try {
+            await deleteAdminCategoria(id);
+            sileo.info({ title: 'Categoría eliminada' });
+            cargar();
+          } catch (err) {
+            sileo.error({ title: err.message || 'Error al eliminar' });
+          }
+        }
+      }
     });
   }
 

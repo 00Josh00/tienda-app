@@ -34,11 +34,18 @@ export default function AdminPedidoDetalle() {
       description: `¿Estás seguro de eliminar el pedido #${pedido.id} permanentemente?`,
       duration: null,
       autopilot: false,
-      button: { title: 'Eliminar', onClick: () => {
-        deleteAdminPedido(pedido.id)
-          .then(() => navigate('/admin/pedidos'))
-          .catch(err => sileo.error({ title: err.message }));
-      } }
+      button: {
+        title: 'Eliminar',
+        onClick: async () => {
+          try {
+            await deleteAdminPedido(pedido.id);
+            sileo.info({ title: 'Pedido eliminado' });
+            navigate('/admin/pedidos');
+          } catch (err) {
+            sileo.error({ title: err.message || 'Error al eliminar' });
+          }
+        }
+      }
     });
   }
 
