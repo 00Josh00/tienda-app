@@ -27,13 +27,10 @@ export default function AdminPedidos() {
   async function handleDelete(id, nombre) {
     sileo.action({
       title: `¿Eliminar pedido #${id}${nombre ? ' de ' + nombre : ''}?`,
-      button: { onClick: async () => {
-        try {
-          await deleteAdminPedido(id);
-          setPedidos(pedidos.filter(p => p.id !== id));
-        } catch (err) {
-          sileo.error({ title: err.message });
-        }
+      button: { title: 'Eliminar', onClick: () => {
+        deleteAdminPedido(id)
+          .then(() => setPedidos(pedidos.filter(p => p.id !== id)))
+          .catch(err => sileo.error({ title: err.message }));
       } }
     });
   }

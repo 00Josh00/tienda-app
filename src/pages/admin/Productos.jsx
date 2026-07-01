@@ -25,7 +25,7 @@ export default function AdminProductos() {
   async function handleEliminar(id) {
     sileo.action({
       title: '¿Eliminar producto?',
-      button: { onClick: async () => { await deleteAdminProducto(id); cargar(); } }
+      button: { title: 'Eliminar', onClick: () => { deleteAdminProducto(id).then(cargar); } }
     });
   }
 

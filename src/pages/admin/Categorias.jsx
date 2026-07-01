@@ -54,7 +54,7 @@ export default function AdminCategorias() {
   async function handleEliminar(id) {
     sileo.action({
       title: '¿Eliminar categoría?',
-      button: { onClick: async () => { await deleteAdminCategoria(id); cargar(); } }
+      button: { title: 'Eliminar', onClick: () => { deleteAdminCategoria(id).then(cargar); } }
     });
   }
 

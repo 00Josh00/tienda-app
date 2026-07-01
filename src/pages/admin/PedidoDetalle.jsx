@@ -31,13 +31,10 @@ export default function AdminPedidoDetalle() {
   async function handleDelete() {
     sileo.action({
       title: `¿Eliminar pedido #${pedido.id} permanentemente?`,
-      button: { onClick: async () => {
-        try {
-          await deleteAdminPedido(pedido.id);
-          navigate('/admin/pedidos');
-        } catch (err) {
-          sileo.error({ title: err.message });
-        }
+      button: { title: 'Eliminar', onClick: () => {
+        deleteAdminPedido(pedido.id)
+          .then(() => navigate('/admin/pedidos'))
+          .catch(err => sileo.error({ title: err.message }));
       } }
     });
   }
